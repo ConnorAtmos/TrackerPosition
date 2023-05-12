@@ -1,43 +1,68 @@
-import openvr, time
-import numpy as np
-import matplotlib.pyplot as plt
+import time, openvr
+import trackerpositions
+from matplotlib import pyplot as plt
 
-def matrix_to_euler_angles(rotation_matrix):
-    # Convert rotation matrix to Euler angles (X-Y-Z, extrinsic rotations)
-    sy = np.sqrt(rotation_matrix[0][0] * rotation_matrix[0][0] + rotation_matrix[1][0] * rotation_matrix[1][0])
-    singular = sy < 1e-6
-    if not singular:
-        x = np.arctan2(rotation_matrix[2][1], rotation_matrix[2][2])
-        y = np.arctan2(-rotation_matrix[2][0], sy)
-        z = np.arctan2(rotation_matrix[1][0], rotation_matrix[0][0])
-    else:
-        x = np.arctan2(-rotation_matrix[1][2], rotation_matrix[1][1])
-        y = np.arctan2(-rotation_matrix[2][0], sy)
-        z = 0.0
-    return np.degrees(x), np.degrees(y), np.degrees(z)
 
-def get_headset_pose():
-    vr_system = openvr.init(openvr.VRApplication_Background)
-    poses = vr_system.getDeviceToAbsoluteTrackingPose(openvr.TrackingUniverseStanding, 0, openvr.k_unMaxTrackedDeviceCount)
-    hmd_pose = poses[openvr.k_unTrackedDeviceIndex_Hmd]
+trackerpositions.initialize_vr_system()
 
-    # Extract position and rotation from hmd_pose
-    position = hmd_pose.mDeviceToAbsoluteTracking[0][3], hmd_pose.mDeviceToAbsoluteTracking[1][3], hmd_pose.mDeviceToAbsoluteTracking[2][3]
-    rotation = np.zeros((3, 3))
-    for i in range(3):
-        for j in range(3):
-            rotation[i][j] = hmd_pose.mDeviceToAbsoluteTracking[i][j]
-
-    openvr.shutdown()
-
-    rotation = matrix_to_euler_angles(rotation)
-
-    return position, rotation
-
+positions, rotations = trackerpositions.get_all_poses()
 
 if __name__ == '__main__':
-    while True:
-        position, rotation = get_headset_pose()
-        print(f"Position - X: {position[0]:.2f}, Y: {position[1]:.2f}, Z: {position[2]:.2f}")
-        print(f"Rotation - X: {rotation[0]:.2f}, Y: {rotation[1]:.2f}, Z: {rotation[2]:.2f}")
+
+
+    # get base station poses
+    pos1, rot1 = trackerpositions.get_base_station_pose(0)
+    pos2, rot2 = trackerpositions.get_base_station_pose(1)
+    pos3, rot3 = trackerpositions.get_base_station_pose(2)
+
+    # 3d plot of base stations
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+    ax.scatter(pos1[0], pos1[2], pos1[1], c='r', marker='o')
+    ax.scatter(pos2[0], pos2[2], pos2[1], c='b', marker='o')
+    ax.scatter(pos3[0], pos3[2], pos3[1], c='g', marker='o')
+
+
+    # Get position and rotation of the headset
+    position, rotation = trackerpositions.get_headset_pose()
+
+    # plot headset
+    ax.scatter(position[0], position[2], position[1], c='k', marker='o')
+
+    # Get position and rotation of the left controller
+    position, rotation = trackerpositions.get_left_controller_pose()
+
+    # plot left controller
+    ax.scatter(position[0], position[2], position[1], c='y', marker='o')
+
+    # Get position and rotation of the right controller
+    position, rotation = trackerpositions.get_right_controller_pose()
+
+    # plot right controller
+    ax.scatter(position[0], position[2], position[1], c='m', marker='o')
+
+    # plot hip tracker
+    position, rotation = trackerpositions.get_tracker_pose(0)
+    ax.scatter(position[0], position[2], position[1], c='c', marker='o')
+
+    # plot left foot tracker
+    position, rotation = trackerpositions.get_tracker_pose(1)
+    ax.scatter(position[0], position[2], position[1], c='r', marker='o')
+
+    # plot right foot tracker
+    position, rotation = trackerpositions.get_tracker_pose(2)
+    ax.scatter(position[0], position[2], position[1], c='b', marker='o')
+
+
+    plt.show()
+
+    while False:
+
+
+
+
+
+        #position, rotation = trackerpositions.get_right_controller_pose()
+        #print(f"Position - X: {position[0]:.2f}, Y: {position[1]:.2f}, Z: {position[2]:.2f}")
+        #print(f"Rotation - X: {rotation[0]:.2f}, Y: {rotation[1]:.2f}, Z: {rotation[2]:.2f}")
         time.sleep(0.5)
