@@ -34,6 +34,7 @@ def get_headset_pose():
 
     return position, rotation
 
+
 if __name__ == '__main__':
     while True:
         position, rotation = get_headset_pose()
