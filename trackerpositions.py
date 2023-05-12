@@ -3,6 +3,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 vr_system = openvr.init(openvr.VRApplication_Background)
+
+must_output_positions = True
 def initialize_vr_system():
     global vr_system
     vr_system = openvr.init(openvr.VRApplication_Background)
@@ -63,6 +65,8 @@ def get_base_station_pose(base_station_index):
                 base_station_indices.append(i)
 
     if not base_station_indices:
+        if must_output_positions:
+            return [0, 0, 0], [0, 0, 0]
         print("Could not find any connected base stations")
         return None
 
@@ -107,6 +111,8 @@ def get_left_controller_pose():
                 break
 
     if left_controller_index is None:
+        if must_output_positions:
+            return [0, 0, 0], [0, 0, 0]
         print("Could not find left controller")
         return None
 
@@ -134,6 +140,8 @@ def get_right_controller_pose():
                 break
 
     if right_controller_index is None:
+        if must_output_positions:
+            return [0, 0, 0], [0, 0, 0]
         print("Could not find right controller")
         return None
 
@@ -156,6 +164,8 @@ def get_tracker_pose(index:int):
         if device_class == openvr.TrackedDeviceClass_GenericTracker:
             tracker_indexes.append(i)
     if len(tracker_indexes) == 0:
+        if must_output_positions:
+            return [0, 0, 0], [0, 0, 0]
         print("Could not find any trackers")
         return None
 
