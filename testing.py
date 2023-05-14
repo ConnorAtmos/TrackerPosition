@@ -89,7 +89,7 @@ def main():
     plt.show()
 
     #save the plot as a png
-    plt.savefig("3dplot.png")
+    fig.savefig("3dplot.png")
 
 
     # get average position and rotation of each object
