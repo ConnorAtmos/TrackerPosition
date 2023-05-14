@@ -5,8 +5,6 @@ from matplotlib import pyplot as plt
 
 trackerpositions.initialize_vr_system()
 
-positions, rotations = trackerpositions.get_all_poses()
-
 
 def update_ax(ax):
     ax.set_xlabel('X', fontsize=14)
