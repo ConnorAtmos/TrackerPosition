@@ -13,6 +13,12 @@ trackerpositions.initialize_vr_system()
 num_entries = 1000
 time_between_entries = 0.01 # seconds
 
+base_stations = True
+num_base_stations = 3
+
+trackers = True
+num_trackers = 3
+
 def get_distance(pos1, pos2):
     return ((pos1[0]-pos2[0])**2 + (pos1[1]-pos2[1])**2 + (pos1[2]-pos2[2])**2)**0.5
 
@@ -28,8 +34,8 @@ def update_plot(ax, object_name, pos_rot_tuple):
         used_object_names.append(object_name)
         ax.scatter(pos_rot_tuple[0][0], pos_rot_tuple[0][2], pos_rot_tuple[0][1], marker='o')
 
-        # plot the text
-        ax.text(pos_rot_tuple[0][0], pos_rot_tuple[0][2], pos_rot_tuple[0][1], object_name, size=10, zorder=1, color='k')
+        # plot the text, but center it on the point, but offset it above the point
+        ax.text(pos_rot_tuple[0][0], pos_rot_tuple[0][2], pos_rot_tuple[0][1], object_name, fontsize=10, horizontalalignment='center', verticalalignment='bottom', color='k', zorder=1)
 
 def main():
 
@@ -39,12 +45,19 @@ def main():
     plt.title("3D Space", fontsize=20)
 
     ax.set_xlabel('X', fontsize=14)
-    ax.set_ylabel('Z', fontsize=14)
+    ax.set_ylabel('-Z (flipped)', fontsize=14)
     ax.set_zlabel('Y', fontsize=14)
 
     package = {}
 
     def update_package(object_name, pos_rot_tuple):
+
+        # multiply by 1000 to convert from meters to millimeters (pos only)
+        pos_rot_tuple = (np.array(pos_rot_tuple[0])*1000, pos_rot_tuple[1])
+
+        # flip z axis
+        pos_rot_tuple[0][2] = -pos_rot_tuple[0][2]
+
         if object_name not in package:
             package[object_name] = {}
 
@@ -71,18 +84,18 @@ def main():
         update_package("headset", trackerpositions.get_headset_pose())
 
         # controllers
-        update_package("left_controller", trackerpositions.get_left_controller_pose())
-        update_package("right_controller", trackerpositions.get_right_controller_pose())
+        update_package("lcontroller", trackerpositions.get_left_controller_pose())
+        update_package("rcontroller", trackerpositions.get_right_controller_pose())
 
         # base stations
-        update_package("base_station_1", trackerpositions.get_base_station_pose(0))
-        update_package("base_station_2", trackerpositions.get_base_station_pose(1))
-        update_package("base_station_3", trackerpositions.get_base_station_pose(2))
+        if base_stations:
+            for j in range(num_base_stations):
+                update_package("basestation{}".format(j), trackerpositions.get_base_station_pose(j))
 
         # trackers
-        update_package("tracker_1", trackerpositions.get_tracker_pose(0))
-        update_package("tracker_2", trackerpositions.get_tracker_pose(1))
-        update_package("tracker_3", trackerpositions.get_tracker_pose(2))
+        if trackers:
+            for j in range(num_trackers):
+                update_package("tracker{}".format(j), trackerpositions.get_tracker_pose(j))
 
         time.sleep(time_between_entries)
 
@@ -90,6 +103,19 @@ def main():
 
     #save the plot as a png
     fig.savefig("3dplot.png")
+
+    # go through all package data and remove duplicates for each object
+    for object_name in package:
+        for pos_rot_key, pos_rot_values in package[object_name].items():
+            print("Evaluating object: ", object_name, " for key: ", pos_rot_key)
+            for i in range(len(pos_rot_values)-1, -1, -1):
+
+                if i != 0:
+                    for j in range(i):
+                        if np.array_equal(pos_rot_values[i], pos_rot_values[j]):
+                            print("Removing duplicate: ", pos_rot_values[i])
+                            del pos_rot_values[i]
+                            break
 
 
     # get average position and rotation of each object
@@ -114,9 +140,15 @@ def main():
 
             for pos_rot_value in pos_rot_values:
 
-                if pos_rot_value == "rotation":
+                if pos_rot_key == "rotation":
                     # if it's rotation, cap the distance at 180 degrees. If it's more than 180 degrees, subtract 360 degrees and take the absolute value
-                    package_distances[object_name][pos_rot_key].append(min(abs(pos_rot_value - package_averages[object_name][pos_rot_key]), 360 - abs(pos_rot_value - package_averages[object_name][pos_rot_key])))
+
+                    dist = get_distance(pos_rot_value, package_averages[object_name][pos_rot_key])
+
+                    if dist > 180:
+                        dist = abs(dist - 360)
+
+                    package_distances[object_name][pos_rot_key].append(dist)
 
                 else:
                     package_distances[object_name][pos_rot_key].append(get_distance(pos_rot_value, package_averages[object_name][pos_rot_key]))
