@@ -33,6 +33,7 @@ num_base_stations = 12
 if __name__ == '__main__':
 
     # Initialize plot
+    ax, fig = None, None
     if display_plot:
         ax, fig = plot_data.initialize_plot()
 
