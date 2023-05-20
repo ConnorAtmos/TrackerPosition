@@ -2,12 +2,56 @@ import openvr, time
 import numpy as np
 import matplotlib.pyplot as plt
 
+#######################################################################################
+# How to use this file
+#######################################################################################
+# This file is a library of functions that grabs the position and rotation of the headset,
+# controllers, base stations, and trackers.
+# To use this file, import it into your own file like this:
+# import trackerpositions
+#######################################################################################
+
+#######################################################################################
+# What this file does
+#######################################################################################
+# This file is used to grab the position and rotation of the headset, controllers,
+# base stations, and trackers.
+# NOTE: rotations are in degrees, not radians.
+# To convert to radians, use np.radians(rotation) or set radians=True in the function call.
+#######################################################################################
+
+#######################################################################################
+# Steps in main.py:
+#######################################################################################
+# 1. Import trackerpositions.py
+# ex:
+# import trackerpositions
+#
+# 2. Get headset position and rotation
+# ex:
+# headset_position, headset_rotation = trackerpositions.get_headset_pose()
+#
+# 3. Get left controller position and rotation
+# ex:
+# controller_position, controller_rotation = trackerpositions.get_left_controller_pose()
+#
+# 4. Get right controller position and rotation
+# ex:
+# controller_position, controller_rotation = trackerpositions.get_right_controller_pose()
+#
+# 5. Get base station position and rotation
+# ex:
+# base_station_position, base_station_rotation = trackerpositions.get_base_station_pose(0) # 0 is the index of the first base station
+#
+# 6. Get tracker position and rotation
+# ex:
+# tracker_position, tracker_rotation = trackerpositions.get_tracker_pose(0) # 0 is the index of the first tracker
+#
+#######################################################################################
+
 vr_system = openvr.init(openvr.VRApplication_Background)
 
 must_output_positions = True
-def initialize_vr_system():
-    global vr_system
-    vr_system = openvr.init(openvr.VRApplication_Background)
 
 
 def matrix_to_euler_angles(rotation_matrix):
@@ -25,7 +69,7 @@ def matrix_to_euler_angles(rotation_matrix):
     return np.degrees(x), np.degrees(y), np.degrees(z)
 
 
-def get_position_rotation_from_hmd_pose(hmd_pose):
+def get_position_rotation_from_hmd_pose(hmd_pose, radians=False):
     # Extract position and rotation from hmd_pose
     position = hmd_pose.mDeviceToAbsoluteTracking[0][3], hmd_pose.mDeviceToAbsoluteTracking[1][3], hmd_pose.mDeviceToAbsoluteTracking[2][3]
     rotation = np.zeros((3, 3))
@@ -35,9 +79,12 @@ def get_position_rotation_from_hmd_pose(hmd_pose):
 
     rotation = matrix_to_euler_angles(rotation)
 
+    if radians:
+        rotation = np.radians(rotation)
+
     return position, rotation
 
-def get_all_poses():
+def get_all_poses(radians=False):
     global vr_system
     poses = vr_system.getDeviceToAbsoluteTrackingPose(openvr.TrackingUniverseStanding, 0,
                                                       openvr.k_unMaxTrackedDeviceCount)
@@ -46,13 +93,13 @@ def get_all_poses():
     rotations = []
     for i in range(openvr.k_unMaxTrackedDeviceCount):
         hmd_pose = poses[i]
-        position, rotation = get_position_rotation_from_hmd_pose(hmd_pose)
+        position, rotation = get_position_rotation_from_hmd_pose(hmd_pose, radians)
         positions.append(position)
         rotations.append(rotation)
 
     return positions, rotations
 
-def get_base_station_pose(base_station_index):
+def get_base_station_pose(base_station_index, radians=False):
     global vr_system
 
     # Find the indices of all connected base stations
@@ -81,23 +128,23 @@ def get_base_station_pose(base_station_index):
     poses = vr_system.getDeviceToAbsoluteTrackingPose(openvr.TrackingUniverseStanding, 0, openvr.k_unMaxTrackedDeviceCount)
     base_station_pose = poses[adjusted_base_station_index]
 
-    position, rotation = get_position_rotation_from_hmd_pose(base_station_pose)
+    position, rotation = get_position_rotation_from_hmd_pose(base_station_pose, radians)
 
     return position, rotation
 
 
 
-def get_headset_pose():
+def get_headset_pose(radians=False):
     global vr_system
     poses = vr_system.getDeviceToAbsoluteTrackingPose(openvr.TrackingUniverseStanding, 0,
                                                       openvr.k_unMaxTrackedDeviceCount)
     hmd_pose = poses[openvr.k_unTrackedDeviceIndex_Hmd + 0]
 
-    position, rotation = get_position_rotation_from_hmd_pose(hmd_pose)
+    position, rotation = get_position_rotation_from_hmd_pose(hmd_pose, radians)
 
     return position, rotation
 
-def get_left_controller_pose():
+def get_left_controller_pose(radians=False):
     global vr_system
 
     # Find the index of the left controller
@@ -120,13 +167,13 @@ def get_left_controller_pose():
     poses = vr_system.getDeviceToAbsoluteTrackingPose(openvr.TrackingUniverseStanding, 0, openvr.k_unMaxTrackedDeviceCount)
     controller_pose = poses[left_controller_index]
 
-    position, rotation = get_position_rotation_from_hmd_pose(controller_pose)
+    position, rotation = get_position_rotation_from_hmd_pose(controller_pose, radians)
 
     return position, rotation
 
 
 
-def get_right_controller_pose():
+def get_right_controller_pose(radains=False):
     global vr_system
 
     # Find the index of the right controller
@@ -149,12 +196,12 @@ def get_right_controller_pose():
     poses = vr_system.getDeviceToAbsoluteTrackingPose(openvr.TrackingUniverseStanding, 0, openvr.k_unMaxTrackedDeviceCount)
     controller_pose = poses[right_controller_index]
 
-    position, rotation = get_position_rotation_from_hmd_pose(controller_pose)
+    position, rotation = get_position_rotation_from_hmd_pose(controller_pose, radians)
 
     return position, rotation
 
 
-def get_tracker_pose(index:int):
+def get_tracker_pose(index:int, radians=False):
     global vr_system
 
     # Find the index of the waist tracker
@@ -173,7 +220,7 @@ def get_tracker_pose(index:int):
     poses = vr_system.getDeviceToAbsoluteTrackingPose(openvr.TrackingUniverseStanding, 0, openvr.k_unMaxTrackedDeviceCount)
     tracker_pose = poses[tracker_indexes[index]]
 
-    position, rotation = get_position_rotation_from_hmd_pose(tracker_pose)
+    position, rotation = get_position_rotation_from_hmd_pose(tracker_pose, radians)
 
     return position, rotation
 

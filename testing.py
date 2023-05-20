@@ -3,13 +3,32 @@ import trackerpositions
 from matplotlib import pyplot as plt
 import numpy as np
 
+#######################################################################################
+# How to use this file
+#######################################################################################
+# Right click on this file and click "Run 'testing'", or type
+# "python testing.py" in the terminal.
+#######################################################################################
 
-trackerpositions.initialize_vr_system()
+#######################################################################################
+# What this file does
+#######################################################################################
+# This file is used to grab entries from the trackers, headset, and base stations and put them in a list.
+# an entry is a dictionary with the following format:
+# {
+#   "name": "headset",
+#   "position": [x, y, z],
+#   "rotation": [x, y, z, w]
+# }
 
+# The list of entries is then used to calculate the standard deviation of the position and rotation of each object.
+# This is used to determine how much the objects are moving, rotating, and vibrating.
+# It will then print out the standard deviation of each object and output it to a file.
+#######################################################################################
 
-# This would be grabbing 1000 data points from the three trackers, headset, base stations, and controllers and putting them in a list
-
-
+#######################################################################################
+# Setup and Configuration
+#######################################################################################
 num_entries = 1000
 time_between_entries = 0.01 # seconds
 
@@ -18,6 +37,7 @@ num_base_stations = 3
 
 trackers = True
 num_trackers = 3
+#######################################################################################
 
 def get_distance(pos1, pos2):
     return ((pos1[0]-pos2[0])**2 + (pos1[1]-pos2[1])**2 + (pos1[2]-pos2[2])**2)**0.5
