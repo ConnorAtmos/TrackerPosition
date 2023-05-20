@@ -49,10 +49,15 @@ import matplotlib.pyplot as plt
 #
 #######################################################################################
 
+#######################################################################################
+# Setup and Configuration
+#######################################################################################
+# If no devices are connected, this will return [0, 0, 0] for position and [0, 0, 0] for rotation
+must_return_positions = True
+#######################################################################################
+
+
 vr_system = openvr.init(openvr.VRApplication_Background)
-
-must_output_positions = True
-
 
 def matrix_to_euler_angles(rotation_matrix):
     # Convert rotation matrix to Euler angles (X-Y-Z, extrinsic rotations)
@@ -112,7 +117,7 @@ def get_base_station_pose(base_station_index, radians=False):
                 base_station_indices.append(i)
 
     if not base_station_indices:
-        if must_output_positions:
+        if must_return_positions:
             return [0, 0, 0], [0, 0, 0]
         print("Could not find any connected base stations")
         return None
@@ -158,7 +163,7 @@ def get_left_controller_pose(radians=False):
                 break
 
     if left_controller_index is None:
-        if must_output_positions:
+        if must_return_positions:
             return [0, 0, 0], [0, 0, 0]
         print("Could not find left controller")
         return None
@@ -173,7 +178,7 @@ def get_left_controller_pose(radians=False):
 
 
 
-def get_right_controller_pose(radains=False):
+def get_right_controller_pose(radians=False):
     global vr_system
 
     # Find the index of the right controller
@@ -187,7 +192,7 @@ def get_right_controller_pose(radains=False):
                 break
 
     if right_controller_index is None:
-        if must_output_positions:
+        if must_return_positions:
             return [0, 0, 0], [0, 0, 0]
         print("Could not find right controller")
         return None
@@ -211,7 +216,7 @@ def get_tracker_pose(index:int, radians=False):
         if device_class == openvr.TrackedDeviceClass_GenericTracker:
             tracker_indexes.append(i)
     if len(tracker_indexes) == 0:
-        if must_output_positions:
+        if must_return_positions:
             return [0, 0, 0], [0, 0, 0]
         print("Could not find any trackers")
         return None

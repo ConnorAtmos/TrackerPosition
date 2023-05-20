@@ -29,13 +29,19 @@ import numpy as np
 #######################################################################################
 # Setup and Configuration
 #######################################################################################
+# How many entries to grab
 num_entries = 1000
-time_between_entries = 0.01 # seconds
+# How long to wait between each entry (in seconds)
+time_between_entries = 0.01
 
+# Track base stations?
 base_stations = True
+# Number of base stations
 num_base_stations = 3
 
+# Track trackers?
 trackers = True
+# Number of trackers
 num_trackers = 3
 #######################################################################################
 
@@ -237,7 +243,8 @@ def main():
             f.write(str(package_worse_1_percent[object_name]["rotation"]) + "\n")
 
 
-
+def run_test():
+    main()
 
 
 
