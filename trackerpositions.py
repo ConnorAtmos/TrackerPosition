@@ -126,7 +126,6 @@ def get_base_station_pose(base_station_index, radians=False):
     if base_station_index < len(base_station_indices):
         adjusted_base_station_index = base_station_indices[base_station_index]
     else:
-        print("Invalid base station index: {}".format(base_station_index))
         return None
 
     # Get the pose of the base station
