@@ -116,7 +116,6 @@ if __name__ == '__main__':
             # draw
             plot_data.draw(fig)
 
-        print("uh")
         time.sleep(0.1)
 
 
