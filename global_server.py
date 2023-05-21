@@ -1,6 +1,6 @@
 
 import requests, time, json
-
+import threading
 # filler
 port = 5000
 
@@ -8,6 +8,14 @@ user_id = None
 user_pin = None
 
 package = {}
+
+def push_package():
+    response = requests.put('http://connorpersonal.space:5002/vr/cache',
+                            data={'user_id': str(user_id), 'pin': str(user_pin), 'data': json.dumps(package)})
+    if response.status_code != 200:
+        print("Error: " + str(response.status_code))
+        print(response.text)
+
 def update_package(object_name, pos_rot_tuple):
     global package
 
@@ -17,10 +25,15 @@ def update_package(object_name, pos_rot_tuple):
     package[object_name]["position"] = pos_rot_tuple[0]
     package[object_name]["rotation"] = pos_rot_tuple[1]
 
-    response = requests.put('http://connorpersonal.space:5002/vr/cache', data={'user_id': str(user_id), 'pin': str(user_pin), 'data': json.dumps(package)})
-    if response.status_code != 200:
-        print("Error: " + str(response.status_code))
-        print(response.text)
+    # Create a thread for the request
+    #thread = threading.Thread(target=update_thread, args=(object_name, pos_rot_tuple))
+
+    # Start the thread
+    #thread.start()
+
+    # wait for the thread to finish
+    #thread.join()
+
 
 #data = {"Hello World": ":)"}
 

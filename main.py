@@ -1,4 +1,4 @@
-import time, openvr, requests, json
+import time, openvr, requests, json, threading
 import trackerpositions
 import plot_data
 import global_server as server
@@ -18,7 +18,7 @@ display_plot = False
 headset = True
 
 # Enable/disable controllers
-controllers = False
+controllers = True
 
 # Enable/disable trackers
 trackers = True
@@ -49,9 +49,11 @@ if __name__ == '__main__':
     print("Started")
     #print(requests.get('http://connorpersonal.space:5002/vr/cache', params={'users':json.dumps([{'user_id':'20504526', 'pin':'1234'}])}).json())
     #time.sleep(9999)
-    while True:
-        list_of_objects = []
 
+    while True:
+
+
+        list_of_objects = []
 
         def update_values(name, pos, rot, color):
             global list_of_objects
@@ -104,6 +106,7 @@ if __name__ == '__main__':
                     pass
 
 
+        server.push_package()
 
         # Plot data if plot is True
         if display_plot:
@@ -113,6 +116,7 @@ if __name__ == '__main__':
             # draw
             plot_data.draw(fig)
 
+        print("uh")
         time.sleep(0.1)
 
 
