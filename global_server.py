@@ -10,10 +10,10 @@ user_pin = None
 package = {}
 
 
-last_push = time.time()
+#last_push = time.time()
 def thread_push():
-    global last_push
-    cur_push = time.time()
+    #global last_push
+    #cur_push = time.time()
 
     response = requests.put('http://connorpersonal.space:5002/vr/cache',
                             data={'user_id': str(user_id), 'pin': str(user_pin), 'data': json.dumps(package)})
@@ -21,12 +21,12 @@ def thread_push():
         print("Error: " + str(response.status_code))
         print(response.text)
 
-    pushes_second = 1 / (cur_push - last_push)
-    pushes_second = "{:.2f}".format(pushes_second)
+    #pushes_second = 1 / (cur_push - last_push)
+    #pushes_second = "{:.2f}".format(pushes_second)
 
-    print("Pushes per second:" + str(pushes_second), end="\r")
+    #print("Pushes per second:" + str(pushes_second), end="\r")
 
-    last_push = cur_push
+    #last_push = cur_push
 
 
 def push_package():
