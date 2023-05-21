@@ -1,7 +1,8 @@
-import time, openvr
+import time, openvr, requests, json
 import trackerpositions
 import plot_data
-import local_server
+import global_server as server
+import roblox_user_id as roblox
 
 #######################################################################################
 # Setup and Configuration
@@ -21,12 +22,15 @@ controllers = False
 # Enable/disable trackers
 trackers = True
 # Number of trackers to be processed
-num_trackers = 12
+num_trackers = 3
 
 # Enable/disable base stations
 base_stations = True
 # Number of base stations to be processed
-num_base_stations = 12
+num_base_stations = 3
+
+server.user_pin = 1234
+server.user_id = 20504526 #roblox.get_user_id("mrfrogg1")
 #######################################################################################
 
 
@@ -38,18 +42,20 @@ if __name__ == '__main__':
         ax, fig = plot_data.initialize_plot()
 
     # Initialize and run server
-    local_server.port = webserver_port
-    local_server.run_server()
+    server.port = webserver_port
+    server.run_server()
 
+    print("Started")
+    #print(requests.get('http://connorpersonal.space:5002/vr/cache', params={'users':json.dumps([{'user_id':'20504526', 'pin':'1234'}])}).json())
+    #time.sleep(9999)
     while True:
-
         list_of_objects = []
 
 
         def update_values(name, pos, rot, color):
             global list_of_objects
             list_of_objects.append({"position": pos, "rotation": rot, "color": color, "name": name})
-            local_server.update_package(name, [pos, rot])
+            server.update_package(name, [pos, rot])
 
         if headset:
             # get headset position and rotation

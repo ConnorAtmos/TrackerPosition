@@ -44,6 +44,9 @@ import threading
 port = 5000
 #######################################################################################
 
+user_id = None
+user_pin = None
+
 package = {}
 def update_package(object_name, pos_rot_tuple):
     global package
