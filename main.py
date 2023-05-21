@@ -86,7 +86,7 @@ if __name__ == '__main__':
     server.port = webserver_port
     server.run_server()
 
-    print("Started")
+    print("Started. Do not close this window, but you can minimize it.")
     #print(requests.get('http://connorpersonal.space:5002/vr/cache', params={'users':json.dumps([{'user_id':'20504526', 'pin':'1234'}])}).json())
     #time.sleep(9999)
 
