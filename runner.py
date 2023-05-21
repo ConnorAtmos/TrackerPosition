@@ -4,6 +4,12 @@ import subprocess
 # Set current directory as working directory
 current_dir = os.getcwd()
 
+# Automatically install pip
+subprocess.run(["python", "-m", "ensurepip", "--default-pip"], check=True)
+
+# Automatically upgrade pip
+subprocess.run(["python", "-m", "pip", "install", "--upgrade", "pip"], check=True)
+
 # Automatically install dependencies
 subprocess.run(["pip", "install", "-r", "requirements.txt"], check=True)
 

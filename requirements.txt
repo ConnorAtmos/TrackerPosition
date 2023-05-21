@@ -3,3 +3,6 @@ requests~=2.30.0
 numpy~=1.24.2
 matplotlib~=3.7.1
 flask~=2.3.2
+easygui~=0.98.3
+pystray~=0.19.4
+pillow~=9.5.0

@@ -4,6 +4,10 @@ import plot_data
 import global_server as server
 import roblox_user_id as roblox
 import numpy as np
+import easygui
+from pystray import MenuItem as item
+import pystray
+from PIL import Image
 
 #######################################################################################
 # Setup and Configuration
@@ -32,10 +36,46 @@ num_base_stations = 3
 
 server.user_pin = 1234
 server.user_id = 20504526 #roblox.get_user_id("mrfrogg1")
-#######################################################################################
-
 
 if __name__ == '__main__':
+
+    input_list = ["Number of Trackers", "Number of Base Stations", "Your Designated Pin", "Roblox User ID or Username"]
+    default_values = [3, 3, 1234, "mrfrogg1"]
+
+    try:
+        with open("stored_values.json", "r") as f:
+            default_values = json.load(f)
+    except:
+        pass
+
+    input_list = easygui.multenterbox("Enter the following information", "Input", input_list, default_values)
+
+    num_trackers = int(input_list[0])
+    num_base_stations = int(input_list[1])
+    server.user_pin = int(input_list[2])
+    user_id = input_list[3]
+    if user_id.isnumeric():
+        server.user_id = int(user_id)
+    else:
+        try:
+            with open("user_id_cache.json", "r") as f:
+                user_id_cache = json.load(f)
+        except:
+            user_id_cache = {}
+
+        if user_id in user_id_cache:
+            server.user_id = user_id_cache[user_id]
+
+        else:
+            server.user_id = roblox.get_user_id(user_id)
+            user_id_cache[user_id] = server.user_id
+            with open("user_id_cache.json", "w") as f:
+                json.dump(user_id_cache, f)
+
+    # save the inputted values as json file
+    with open("stored_values.json", "w") as f:
+        json.dump(input_list, f)
+
 
     # Initialize plot
     ax, fig = None, None
@@ -50,7 +90,28 @@ if __name__ == '__main__':
     #print(requests.get('http://connorpersonal.space:5002/vr/cache', params={'users':json.dumps([{'user_id':'20504526', 'pin':'1234'}])}).json())
     #time.sleep(9999)
 
-    while True:
+    running = True
+
+
+
+    def run_icon():
+
+        def stop_running():
+            global running
+            running = False
+            print("Stopped")
+            icon.stop()
+
+        image = Image.open("icon.ico")
+        menu = (pystray.MenuItem('Quit', stop_running), )
+        icon = pystray.Icon("name", image, "TrackerPosition", menu)
+        icon.run()
+
+    threading.Thread(target=run_icon).start()
+
+
+
+    while running:
 
 
         list_of_objects = []
