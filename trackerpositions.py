@@ -74,7 +74,7 @@ def matrix_to_euler_angles(rotation_matrix):
     return np.degrees(x), np.degrees(y), np.degrees(z)
 
 
-def get_position_rotation_from_hmd_pose(hmd_pose, radians=False):
+def get_position_rotation_from_hmd_pose(hmd_pose):
     # Extract position and rotation from hmd_pose
     position = hmd_pose.mDeviceToAbsoluteTracking[0][3], hmd_pose.mDeviceToAbsoluteTracking[1][3], hmd_pose.mDeviceToAbsoluteTracking[2][3]
     rotation = np.zeros((3, 3))
@@ -84,12 +84,9 @@ def get_position_rotation_from_hmd_pose(hmd_pose, radians=False):
 
     rotation = matrix_to_euler_angles(rotation)
 
-    if radians:
-        rotation = np.radians(rotation)
-
     return position, rotation
 
-def get_all_poses(radians=False):
+def get_all_poses():
     global vr_system
     poses = vr_system.getDeviceToAbsoluteTrackingPose(openvr.TrackingUniverseStanding, 0,
                                                       openvr.k_unMaxTrackedDeviceCount)
@@ -98,13 +95,13 @@ def get_all_poses(radians=False):
     rotations = []
     for i in range(openvr.k_unMaxTrackedDeviceCount):
         hmd_pose = poses[i]
-        position, rotation = get_position_rotation_from_hmd_pose(hmd_pose, radians)
+        position, rotation = get_position_rotation_from_hmd_pose(hmd_pose)
         positions.append(position)
         rotations.append(rotation)
 
     return positions, rotations
 
-def get_base_station_pose(base_station_index, radians=False):
+def get_base_station_pose(base_station_index):
     global vr_system
 
     # Find the indices of all connected base stations
@@ -132,23 +129,23 @@ def get_base_station_pose(base_station_index, radians=False):
     poses = vr_system.getDeviceToAbsoluteTrackingPose(openvr.TrackingUniverseStanding, 0, openvr.k_unMaxTrackedDeviceCount)
     base_station_pose = poses[adjusted_base_station_index]
 
-    position, rotation = get_position_rotation_from_hmd_pose(base_station_pose, radians)
+    position, rotation = get_position_rotation_from_hmd_pose(base_station_pose)
 
     return position, rotation
 
 
 
-def get_headset_pose(radians=False):
+def get_headset_pose():
     global vr_system
     poses = vr_system.getDeviceToAbsoluteTrackingPose(openvr.TrackingUniverseStanding, 0,
                                                       openvr.k_unMaxTrackedDeviceCount)
     hmd_pose = poses[openvr.k_unTrackedDeviceIndex_Hmd + 0]
 
-    position, rotation = get_position_rotation_from_hmd_pose(hmd_pose, radians)
+    position, rotation = get_position_rotation_from_hmd_pose(hmd_pose)
 
     return position, rotation
 
-def get_left_controller_pose(radians=False):
+def get_left_controller_pose():
     global vr_system
 
     # Find the index of the left controller
@@ -171,13 +168,13 @@ def get_left_controller_pose(radians=False):
     poses = vr_system.getDeviceToAbsoluteTrackingPose(openvr.TrackingUniverseStanding, 0, openvr.k_unMaxTrackedDeviceCount)
     controller_pose = poses[left_controller_index]
 
-    position, rotation = get_position_rotation_from_hmd_pose(controller_pose, radians)
+    position, rotation = get_position_rotation_from_hmd_pose(controller_pose)
 
     return position, rotation
 
 
 
-def get_right_controller_pose(radians=False):
+def get_right_controller_pose():
     global vr_system
 
     # Find the index of the right controller
@@ -200,12 +197,12 @@ def get_right_controller_pose(radians=False):
     poses = vr_system.getDeviceToAbsoluteTrackingPose(openvr.TrackingUniverseStanding, 0, openvr.k_unMaxTrackedDeviceCount)
     controller_pose = poses[right_controller_index]
 
-    position, rotation = get_position_rotation_from_hmd_pose(controller_pose, radians)
+    position, rotation = get_position_rotation_from_hmd_pose(controller_pose)
 
     return position, rotation
 
 
-def get_tracker_pose(index:int, radians=False):
+def get_tracker_pose(index:int):
     global vr_system
 
     # Find the index of the waist tracker
@@ -224,7 +221,7 @@ def get_tracker_pose(index:int, radians=False):
     poses = vr_system.getDeviceToAbsoluteTrackingPose(openvr.TrackingUniverseStanding, 0, openvr.k_unMaxTrackedDeviceCount)
     tracker_pose = poses[tracker_indexes[index]]
 
-    position, rotation = get_position_rotation_from_hmd_pose(tracker_pose, radians)
+    position, rotation = get_position_rotation_from_hmd_pose(tracker_pose)
 
     return position, rotation
 

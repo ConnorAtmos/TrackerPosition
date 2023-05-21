@@ -3,6 +3,7 @@ import trackerpositions
 import plot_data
 import global_server as server
 import roblox_user_id as roblox
+import numpy as np
 
 #######################################################################################
 # Setup and Configuration
@@ -14,7 +15,7 @@ webserver_port = 5002
 display_plot = False
 
 # Enable/disable headset
-headset = False
+headset = True
 
 # Enable/disable controllers
 controllers = False
@@ -54,6 +55,19 @@ if __name__ == '__main__':
 
         def update_values(name, pos, rot, color):
             global list_of_objects
+
+            # 1 stud is 0.28 meters, so divide by 0.28 to get the number of studs
+            pos = np.array(pos) / 0.28
+            # convert to list
+            pos = pos.tolist()
+
+            # convert rotation to radians
+            rot = np.array(rot) * 180 / np.pi
+            # convert to list
+            rot = rot.tolist()
+
+
+
             list_of_objects.append({"position": pos, "rotation": rot, "color": color, "name": name})
             server.update_package(name, [pos, rot])
 
