@@ -104,8 +104,6 @@ if __name__ == '__main__':
         def stop_running():
             global running
             running = False
-            if base_station:
-                base_station_control.turn_base_stations_off()
             print("Stopped")
             icon.stop()
 
