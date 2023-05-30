@@ -27,7 +27,6 @@ CMD_ON_V2 = b"\x01"
 CMD_OFF_V2 = b"\x00"
 
 async def powerState(bs, value):
-    print(value)
     try:
         async with BleakClient(bs) as client:
             print("~%s~" % bs)
