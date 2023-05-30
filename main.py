@@ -1,4 +1,4 @@
-import time, openvr, requests, json, threading, pystray, easygui
+import time, openvr, requests, json, threading, pystray, easygui, atexit
 import trackerpositions, base_station_control, plot_data
 import global_server as server
 import roblox_user_id as roblox
@@ -39,7 +39,10 @@ if __name__ == '__main__':
     base_station = easygui.ynbox("Would you like to turn on base stations?", "Input", ["Yes", "No"])
     print(base_station)
     if base_station:
-        base_station_control.turn_base_stations_on()
+        def control_base_stations():
+            base_station_control.turn_base_stations_on()
+            atexit.register(base_station_control.turn_base_stations_off)
+        threading.Thread(target=control_base_stations).start()
 
 
     input_list = ["Number of Trackers", "Number of Base Stations", "Your Designated Pin", "Roblox User ID or Username"]
@@ -103,10 +106,6 @@ if __name__ == '__main__':
             global running
             running = False
             print("Stopped")
-
-            # Turn base stations off if they were turned on
-            if base_station:
-                base_station_control.turn_base_stations_off()
             icon.stop()
 
         image = Image.open("icon.ico")
