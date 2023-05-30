@@ -1,12 +1,8 @@
-import time, openvr, requests, json, threading
-import trackerpositions
-import plot_data
+import time, openvr, requests, json, threading, pystray, easygui
+import trackerpositions, base_station_control, plot_data
 import global_server as server
 import roblox_user_id as roblox
 import numpy as np
-import easygui
-from pystray import MenuItem as item
-import pystray
 from PIL import Image
 
 #######################################################################################
@@ -38,6 +34,13 @@ server.user_pin = 1234
 server.user_id = 20504526 #roblox.get_user_id("mrfrogg1")
 
 if __name__ == '__main__':
+
+    # add the option to turn on base stations
+    base_station = easygui.ynbox("Would you like to turn on base stations?", "Input", ["Yes", "No"])
+    print(base_station)
+    if base_station:
+        base_station_control.turn_base_stations_on()
+
 
     input_list = ["Number of Trackers", "Number of Base Stations", "Your Designated Pin", "Roblox User ID or Username"]
     default_values = [3, 3, 1234, "mrfrogg1"]
@@ -100,6 +103,10 @@ if __name__ == '__main__':
             global running
             running = False
             print("Stopped")
+
+            # Turn base stations off if they were turned on
+            if base_station:
+                base_station_control.turn_base_stations_off()
             icon.stop()
 
         image = Image.open("icon.ico")

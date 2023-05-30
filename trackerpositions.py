@@ -56,8 +56,13 @@ import matplotlib.pyplot as plt
 must_return_positions = True
 #######################################################################################
 
+try:
+    vr_system = openvr.init(openvr.VRApplication_Background)
+except openvr.OpenVRError as e:
+    print(e)
+    print("Error: Could not initialize OpenVR. Is SteamVR running?")
+    exit(1)
 
-vr_system = openvr.init(openvr.VRApplication_Background)
 
 def matrix_to_euler_angles(rotation_matrix):
     # Convert rotation matrix to Euler angles (X-Y-Z, extrinsic rotations)

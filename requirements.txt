@@ -6,3 +6,4 @@ flask~=2.3.2
 easygui~=0.98.3
 pystray~=0.19.4
 pillow~=9.5.0
+bleak~=0.20.2
