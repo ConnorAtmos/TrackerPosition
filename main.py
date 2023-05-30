@@ -1,4 +1,4 @@
-import time, openvr, requests, json, threading, pystray, easygui, atexit
+import time, openvr, requests, json, threading, pystray, easygui
 import trackerpositions, base_station_control, plot_data
 import global_server as server
 import roblox_user_id as roblox
@@ -41,7 +41,6 @@ if __name__ == '__main__':
     if base_station:
         def control_base_stations():
             base_station_control.turn_base_stations_on()
-            atexit.register(base_station_control.turn_base_stations_off)
         threading.Thread(target=control_base_stations).start()
 
 
@@ -105,6 +104,8 @@ if __name__ == '__main__':
         def stop_running():
             global running
             running = False
+            if base_station:
+                base_station_control.turn_base_stations_off()
             print("Stopped")
             icon.stop()
 
