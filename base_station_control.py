@@ -9,7 +9,7 @@ import argparse
 # https://github.com/MissingNO123/HTC_BS_Control/tree/main
 # 5/30/2023
 #############################################################
-PowerState = False
+PowerState = True
 
 
 saved_addrs = []
